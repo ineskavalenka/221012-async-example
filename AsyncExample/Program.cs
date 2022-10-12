@@ -12,7 +12,8 @@ namespace AsyncBreakfast
     internal class Egg { }
     internal class Juice { }
     internal class Toast { }
-
+    internal class Compile { }
+    
     class Program
     {
         static async Task Main(string[] args)
@@ -20,6 +21,8 @@ namespace AsyncBreakfast
             Coffee cup = PourCoffee();
             Console.WriteLine("coffee is ready");
 
+            var longProcessTask = LongProcessAsync();
+            
             var eggsTask = FryEggsAsync(2);
             var baconTask = FryBaconAsync(3);
             var toastTask = MakeToastWithButterAndJamAsync(2);
@@ -45,7 +48,12 @@ namespace AsyncBreakfast
 
             Juice oj = PourOJ();
             Console.WriteLine("oj is ready");
-            Console.WriteLine("Breakfast is ready!");
+            
+            Console.WriteLine("awaiting");
+
+            var res = await longProcessTask;
+            
+            Console.WriteLine(res ? "Breakfast is ready!" : "Breakfast failed");
         }
 
         static async Task<Toast> MakeToastWithButterAndJamAsync(int number)
@@ -69,6 +77,19 @@ namespace AsyncBreakfast
         private static void ApplyButter(Toast toast) =>
             Console.WriteLine("Putting butter on the toast");
 
+        private static async Task<bool> LongProcessAsync()
+        {
+            Console.WriteLine("   Start LongProcess...");
+            for (int i = 0; i <10; i++)
+            {
+                await Task.Delay(1000);
+                Console.WriteLine($"   LongProcess stage {i}");
+            }
+            Console.WriteLine("   LongProcess finished");
+            
+            return (DateTime.Now.Millisecond % 2 == 0);
+        }
+        
         private static async Task<Toast> ToastBreadAsync(int slices)
         {
             for (int slice = 0; slice < slices; slice++)
